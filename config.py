@@ -1,6 +1,6 @@
 """
 ⚙️ CẤU HÌNH TỐI ƯU CHO BOT v3.9 (FIREFOX + PERSISTENT PROFILE)
-Đã sữa: Browser type, ViewPort, Profile path
+Đã sữa: Browser type, ViewPort, Profile path, CDP, Health Check, Batch Processing
 Sử dụng: copy toàn bộ file này
 """
 
@@ -37,35 +37,35 @@ class Config:
     CODE_MAX_LENGTH = 15
     
     # ==========================================
+    # 🌐 CDP CONNECTION (NEW - FIX #1)
+    # ==========================================
+    CDP_HOST = os.getenv('CDP_HOST', 'localhost')
+    CDP_PORT = int(os.getenv('CDP_PORT', 9222))
+    CDP_TIMEOUT = int(os.getenv('CDP_TIMEOUT', 10))
+    CDP_RETRY_ATTEMPTS = int(os.getenv('CDP_RETRY_ATTEMPTS', 3))
+    
+    # ==========================================
     # 🖥️ BROWSER CONFIGURATION (FIXED v3.9)
     # ==========================================
-    BROWSER_TYPE = "firefox"  # ✅ FIREFOX (tối ưu cho CF bypass)
-    # Alternatives: "chromium", "webkit"
-    
-    # ✅ DESKTOP VIEWPORT (không phải điện thoại)
+    BROWSER_TYPE = "firefox"
     VIEWPORT_WIDTH = 1024
     VIEWPORT_HEIGHT = 768
-    
-    # ✅ WINDOW POSITION (fixed)
     WINDOW_POSITION_X = 0
     WINDOW_POSITION_Y = 0
-    
-    # ✅ HEADLESS MODE
-    HEADLESS_MODE = False  # Hiển thị UI để debug
-    
-    # ✅ PROFILE STORAGE (persistent)
-    PROFILE_STORAGE_TYPE = "persistent"  # "persistent" hoặc "temp"
+    HEADLESS_MODE = False
+    PROFILE_STORAGE_TYPE = "persistent"
     PROFILE_CLEANUP_DAYS = 30
     CLEANUP_OLD_PROFILES = True
 
     # ==========================================
     # ⏱️ TIMEOUTS (ms) - TUNED
     # ==========================================
-    PAGE_LOAD_TIMEOUT = int(os.getenv('PAGE_LOAD_TIMEOUT', 30000))
+    PAGE_LOAD_TIMEOUT = int(os.getenv('PAGE_LOAD_TIMEOUT', 15000))
     CLOUDFLARE_WAIT_TIMEOUT = int(os.getenv('CLOUDFLARE_WAIT_TIMEOUT', 60000))
     SUBMIT_TIMEOUT = 5000
     RESULT_WAIT = 2000
     BROWSER_SPAWN_TIMEOUT = 15000
+    SUBMIT_TASK_TIMEOUT = int(os.getenv('SUBMIT_TASK_TIMEOUT', 30))
 
     # ==========================================
     # ⚡ PERFORMANCE - OPTIMIZED FOR SPEED
@@ -83,6 +83,26 @@ class Config:
     MAX_BURST = int(os.getenv('MAX_BURST', 5))
     
     # ==========================================
+    # 🔄 BATCH PROCESSING (NEW - FIX #7)
+    # ==========================================
+    BATCH_MODE_ENABLED = os.getenv('BATCH_MODE_ENABLED', 'True').lower() == 'true'
+    BATCH_SIZE = int(os.getenv('BATCH_SIZE', 5))
+    BATCH_WAIT_TIME = float(os.getenv('BATCH_WAIT_TIME', 0.5))
+    
+    # ==========================================
+    # 🏥 HEALTH CHECK (NEW - FIX #6)
+    # ==========================================
+    HEALTH_CHECK_ENABLED = os.getenv('HEALTH_CHECK_ENABLED', 'True').lower() == 'true'
+    HEALTH_CHECK_INTERVAL = int(os.getenv('HEALTH_CHECK_INTERVAL', 60))
+    AUTO_RECOVERY_ENABLED = os.getenv('AUTO_RECOVERY_ENABLED', 'True').lower() == 'true'
+    
+    # ==========================================
+    # 📊 PERFORMANCE PROFILING (NEW - FIX #8)
+    # ==========================================
+    PERFORMANCE_TRACKING_ENABLED = os.getenv('PERFORMANCE_TRACKING_ENABLED', 'True').lower() == 'true'
+    PERFORMANCE_REPORT_INTERVAL = int(os.getenv('PERFORMANCE_REPORT_INTERVAL', 300))
+
+    # ==========================================
     # 🤖 AUTO-SUBMIT (v3.9) - PRODUCTION READY
     # ==========================================
     AUTO_SUBMIT_ENABLED = os.getenv('AUTO_SUBMIT_ENABLED', 'True').lower() == 'true'
@@ -92,31 +112,36 @@ class Config:
     RANDOM_DELAY_MAX = float(os.getenv('RANDOM_DELAY_MAX', 0.5))
     
     # ==========================================
+    # 🔄 PAGE LOAD RETRY (NEW - FIX #4)
+    # ==========================================
+    PAGE_LOAD_MAX_RETRIES = int(os.getenv('PAGE_LOAD_MAX_RETRIES', 3))
+    PAGE_LOAD_RETRY_DELAY = float(os.getenv('PAGE_LOAD_RETRY_DELAY', 2.0))
+
+    # ==========================================
     # 🔍 INPUT DETECTION (v3.9) - 95% ACCURACY
     # ==========================================
     INPUT_DETECTION_STRATEGY = os.getenv('INPUT_DETECTION_STRATEGY', 'advanced')
     INPUT_DETECTION_TIMEOUT = int(os.getenv('INPUT_DETECTION_TIMEOUT', 5000))
-    MULTIPLE_SELECTOR_ATTEMPTS = int(os.getenv('MULTIPLE_SELECTOR_ATTEMPTS', 4))
-    
+    MULTIPLE_SELECTOR_ATTEMPTS = int(os.getenv('MULTIPLE_SELECTOR_ATTEMPTS', 10))
+
     # ==========================================
     # 📊 RESULT DETECTION (v3.9) - 5 METHODS
     # ==========================================
     RESULT_DETECTION_METHODS = int(os.getenv('RESULT_DETECTION_METHODS', 5))
     RESULT_DETECTION_TIMEOUT = int(os.getenv('RESULT_DETECTION_TIMEOUT', 5000))
     SCREENSHOT_ON_UNKNOWN = os.getenv('SCREENSHOT_ON_UNKNOWN', 'True').lower() == 'true'
-    
+
     # ==========================================
     # 🔄 SESSION ROTATION (v3.9)
     # ==========================================
     SESSION_ROTATION_ENABLED = os.getenv('SESSION_ROTATION_ENABLED', 'False').lower() == 'true'
     SESSION_ROTATION_INTERVAL = int(os.getenv('SESSION_ROTATION_INTERVAL', 100))
     SESSION_ROTATION_DELAY = float(os.getenv('SESSION_ROTATION_DELAY', 2.0))
-    
+
     # ==========================================
     # 📱 CHANNEL CONFIG
     # ==========================================
     CHANNEL_CONFIG = {
-        # CHANNEL 1: MM88VIP
         -1003134541072: {
             "name": "MM88VIP Dịch Vụ Giai Nhân",
             "url": "https://mm88code.com",
@@ -127,8 +152,6 @@ class Config:
                 {"username": "ola12", "priority": 3}
             ]
         },
-
-        # CHANNEL 2: LLWIN
         -1003859359508: {
             "name": "LLwin ĐỈNH CAO CHIẾN THẮNG",
             "url": "https://llwincode.com",
@@ -138,8 +161,6 @@ class Config:
                 {"username": "conve99sau", "priority": 2}
             ]
         },
-
-        # CHANNEL 3: NEW88
         -1002626603440: {
             "name": "NEW88 PHÁT C.O.DE NỔ HŨ - BẮN CÁ MIỄN PHÍ",
             "url": "https://new88b.today/giftcode",
@@ -149,8 +170,6 @@ class Config:
                 {"username": "kuuteo0123", "priority": 2}
             ]
         },
-
-        # CHANNEL 4: XX88
         -1002817093108: {
             "name": "PHÁT CODE XX88",
             "url": "https://xx88code.com/",
@@ -160,8 +179,6 @@ class Config:
                 {"username": "hugolan012", "priority": 2} 
             ]
         },
-
-        # CHANNEL 5: CLIP VUI NEW88
         -1003090141840: {
             "name": "CLIP VUI NEW88",
             "url": "https://new88b.today/giftcode",
@@ -171,8 +188,6 @@ class Config:
                 {"username": "kuuteo0123", "priority": 2}
             ]
         },
-
-        # CHANNEL 6: o8 SOI KÈO 24/7
         -1003917076387: {
             "name": "o8 SOI KÈO 24/7",
             "url": "https://o8code.com/",
